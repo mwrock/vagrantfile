@@ -1,0 +1,37 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+$script = <<SCRIPT
+iex ((new-object net.webclient).DownloadString('https://chocolatey.org/install.ps1'))
+choco install ruby -my -version 2.0.0.64500 -o -ia '"/verysilent /dir=C:/ruby200-x64 /SP- /NOICONS"'
+if(!$env:path.Contains("ruby200-x64")) {
+  $path = "$env:PATH;C:/ruby200-x64/bin"
+  $env:PATH=$path
+  [Environment]::SetEnvironmentVariable("path", $path, "Machine")
+}
+choco install ruby2.devkit -y
+Add-Content -Value "- c:/ruby200-x64" -Path "c:/tools/DevKit2/config.yml"
+cd c:/tools/DevKit2
+ruby dk.rb install -f
+cinst git -y
+gem install bundler
+SCRIPT
+
+Vagrant.configure(2) do |config|
+  config.vm.box = "mwrock/Windows2012R2"
+  config.vm.provision "shell", inline: $script
+  config.vm.guest = :windows  
+
+  config.vm.provider "hyperv" do |hv|
+    hv.ip_address_timeout = 240
+    hv.memory = 2048
+    hv.cpus = 2
+  end
+
+  config.vm.provider :virtualbox do |vb|
+    vb.gui = true
+    vb.memory = 2048
+    vb.cpus = 2
+    vb.network "forwarded_port", guest: 5985, host: 55985
+  end
+end
