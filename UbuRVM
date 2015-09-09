@@ -1,0 +1,28 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+$script = <<SCRIPT
+gpg --keyserver hkp://keys.gnupg.net --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3
+curl -sSL https://get.rvm.io | bash -s stable --ruby
+source ~/.rvm/scripts/rvm
+sudo apt-get install git -y
+gem install bundler
+SCRIPT
+
+Vagrant.configure(2) do |config|
+  config.vm.box = "hashicorp/precise64"
+  config.vm.provision "shell", inline: $script
+
+  config.vm.provider "hyperv" do |hv|
+    hv.ip_address_timeout = 240
+    hv.memory = 2048
+    hv.cpus = 2
+  end
+
+  config.vm.provider :virtualbox do |vb|
+    vb.gui = true
+    vb.memory = 2048
+    vb.cpus = 2
+  end
+
+end
