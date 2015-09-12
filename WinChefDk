@@ -1,0 +1,28 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+$script = <<SCRIPT
+iex ((new-object net.webclient).DownloadString('https://chocolatey.org/install.ps1'))
+choco install chefdk -y
+mkdir (Split-Path -Path $PROFILE -Parent)
+"chef shell-init powershell | Invoke-Expression" > $PROFILE
+SCRIPT
+
+Vagrant.configure(2) do |config|
+  config.vm.box = "mwrock/Windows2012R2"
+  config.vm.provision "shell", inline: $script
+  config.vm.guest = :windows  
+
+  config.vm.provider "hyperv" do |hv|
+    hv.ip_address_timeout = 240
+    hv.memory = 2048
+    hv.cpus = 2
+  end
+
+  config.vm.provider :virtualbox do |vb|
+    vb.gui = true
+    vb.memory = 2048
+    vb.cpus = 2
+    vb.network "forwarded_port", guest: 5985, host: 55985
+  end
+end
