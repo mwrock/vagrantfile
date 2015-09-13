@@ -1,0 +1,61 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+$script = <<SCRIPT
+iex ((new-object net.webclient).DownloadString('https://chocolatey.org/install.ps1'))
+choco install ruby -x86 -y
+if(!$env:path.Contains("ruby21")) {
+  $path = "$env:PATH;C:/tools/ruby21/bin"
+  $env:PATH=$path
+  [Environment]::SetEnvironmentVariable("path", $path, "Machine")
+}
+
+choco install ruby2.devkit -x86 -y
+Add-Content -Value "- c:/tools/ruby21" -Path "c:/tools/DevKit2/config.yml"
+cd c:/tools/DevKit2
+ruby dk.rb install -f
+
+gem install bundler
+
+Set-Content -Value "StrictHostKeyChecking no" -Path "c:/users/vagrant/.ssh/config"
+
+choco install git -y
+if(!$env:path.Contains("Git/usr/bin")) {
+  $path = "$env:PATH;C:/Program Files/Git/cmd;C:/Program Files/Git/usr/bin"
+  $env:PATH=$path
+  [Environment]::SetEnvironmentVariable("path", $path, "Machine")
+}
+
+git config --global user.email "matt@mattwrock.com"
+git config --global user.name "Matt Wrock"
+
+choco install poshgit -y
+
+cd c:/
+git clone https://github.com/chef/omnibus
+git clone https://github.com/chef/omnibus-chef
+git clone https://github.com/chef/omnibus-software
+
+cd c:/omnibus-chef
+bundle install
+SCRIPT
+
+Vagrant.configure(2) do |config|
+  config.vm.box = "mwrock/Windows2012R2"
+  config.vm.provision "shell", inline: $script
+  config.vm.guest = :windows  
+  config.vm.synced_folder "~/.ssh", "c:/users/vagrant/.ssh"
+
+  config.vm.provider "hyperv" do |hv|
+    hv.ip_address_timeout = 240
+    hv.memory = 2048
+    hv.cpus = 2
+  end
+
+  config.vm.provider :virtualbox do |vb|
+    vb.gui = true
+    vb.memory = 2048
+    vb.cpus = 2
+    vb.network "forwarded_port", guest: 5985, host: 55985
+  end
+end
