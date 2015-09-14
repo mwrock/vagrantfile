@@ -40,6 +40,7 @@ git clone https://github.com/chef/omnibus-software
 
 cd c:/omnibus-chef
 bundle install
+bundle update omnibus-software
 bundle exec omnibus build chefdk
 SCRIPT
 
