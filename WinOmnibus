@@ -30,13 +30,11 @@ Add-Path "C:/Program Files (x86)/Windows Kits/8.1/bin/x86"
 choco install git -y
 Add-Path "C:/Program Files/Git/cmd;C:/Program Files/Git/usr/bin"
 
-git config --global user.email "matt@mattwrock.com"
-git config --global user.name "Matt Wrock"
+git config --global user.email "vagrant@example.com"
+git config --global user.name "vagrant"
 
-cd c:/
-git clone https://github.com/chef/omnibus
-git clone https://github.com/chef/omnibus-chef
-git clone https://github.com/chef/omnibus-software
+mkdir c:/omnibus-chef
+Copy-Item c:/vagrant/* c:/omnibus-chef -recurse -force
 
 cd c:/omnibus-chef
 bundle install
