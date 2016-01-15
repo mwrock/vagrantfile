@@ -1,6 +1,8 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
+# This should be put into the root of the chef repo
+
 $script = <<SCRIPT
 function Add-Path($path) {
   if(!$env:path.Contains($path)) {
@@ -11,7 +13,7 @@ function Add-Path($path) {
 }
 
 iex ((new-object net.webclient).DownloadString('https://chocolatey.org/install.ps1'))
-choco install ruby -x86 -y
+choco install ruby -version 2.1.6 -x86 -y
 Add-Path "C:/tools/ruby21/bin"
 
 choco install ruby2.devkit -x86 -y
@@ -33,13 +35,14 @@ Add-Path "C:/Program Files/Git/cmd;C:/Program Files/Git/usr/bin"
 git config --global user.email "vagrant@example.com"
 git config --global user.name "vagrant"
 
-mkdir c:/omnibus-chef -ErrorAction SilentlyContinue
-Copy-Item c:/vagrant/* c:/omnibus-chef -recurse -force
+mkdir c:/dev/chef -ErrorAction SilentlyContinue
+Copy-Item c:/vagrant/* c:/dev/chef -recurse -force
+del c:/dev/chef/.vagrant -recurse
 
-cd c:/omnibus-chef
-bundle install
+cd c:/dev/chef/omnibus
+bundle install --without development
 bundle update omnibus-software
-bundle exec omnibus build chefdk
+bundle exec omnibus build chef
 SCRIPT
 
 Vagrant.configure(2) do |config|
