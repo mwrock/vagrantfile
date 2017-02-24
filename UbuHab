@@ -1,0 +1,73 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+$script = <<SCRIPT
+sudo apt-get update
+sudo apt-get install -y --no-install-recommends \
+    autotools-dev \
+    autoconf \
+    automake \
+    build-essential \
+    ca-certificates \
+    cmake \
+    curl \
+    file \
+    gdb \
+    git \
+    iproute2 \
+    libarchive-dev \
+    libprotobuf-dev \
+    libssl-dev \
+    libtool \
+    libunwind8-dev \
+    man \
+    musl-tools \
+    npm \
+    pkg-config \
+    protobuf-compiler \
+    uuid-dev \
+    libpcre3-dev \
+    wget
+
+git clone https://github.com/jedisct1/libsodium.git
+cd libsodium
+sudo ./autogen.sh
+sudo ./configure
+sudo make
+sudo make install
+
+git clone git://github.com/zeromq/libzmq.git
+cd libzmq
+sudo ./autogen.sh
+sudo ./configure --with-libsodium
+sudo make install
+sudo ldconfig
+
+git clone https://github.com/zeromq/czmq.git
+cd czmq
+sudo ./autogen.sh
+sudo ./configure
+sudo make install
+sudo ldconfig
+
+curl -sSf https://sh.rustup.rs \
+    | sh -s -- -y --default-toolchain stable \
+  && rustup target add x86_64-unknown-linux-musl \
+  && rustc -V
+
+source $HOME/.cargo/env
+
+# sudo adduser --system hab || true
+# sudo addgroup --system hab || true
+SCRIPT
+
+Vagrant.configure(2) do |config|
+  config.vm.box = "ericmann/trusty64"
+  config.vm.provision "shell", inline: $script, privileged: false
+
+  config.vm.provider "hyperv" do |hv|
+    hv.ip_address_timeout = 240
+    hv.memory = 2048
+    hv.cpus = 2
+  end
+end
