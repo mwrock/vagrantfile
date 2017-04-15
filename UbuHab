@@ -27,7 +27,8 @@ sudo apt-get install -y --no-install-recommends \
     protobuf-compiler \
     uuid-dev \
     libpcre3-dev \
-    wget
+    wget \
+    redis-server
 
 git clone https://github.com/jedisct1/libsodium.git
 cd libsodium
@@ -57,8 +58,11 @@ curl -sSf https://sh.rustup.rs \
 
 source $HOME/.cargo/env
 
-# sudo adduser --system hab || true
-# sudo addgroup --system hab || true
+sudo adduser --system hab || true
+sudo addgroup --system hab || true
+
+sudo /vagrant/components/hab/install.sh
+
 SCRIPT
 
 Vagrant.configure(2) do |config|
