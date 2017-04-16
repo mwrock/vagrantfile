@@ -63,6 +63,12 @@ sudo addgroup --system hab || true
 
 sudo /vagrant/components/hab/install.sh
 
+curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.1/install.sh | bash
+export NVM_DIR="$HOME/.nvm" \. "$
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+
+nvm install 4.4.3
+
 SCRIPT
 
 Vagrant.configure(2) do |config|
