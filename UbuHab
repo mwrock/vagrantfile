@@ -27,8 +27,7 @@ sudo apt-get install -y --no-install-recommends \
     protobuf-compiler \
     uuid-dev \
     libpcre3-dev \
-    wget \
-    redis-server
+    wget
 
 git clone https://github.com/jedisct1/libsodium.git
 cd libsodium
@@ -72,9 +71,10 @@ nvm install $(cat /vagrant/components/builder-web/.nvmrc)
 SCRIPT
 
 Vagrant.configure(2) do |config|
-  config.vm.box = "ericmann/trusty64"
+  config.vm.box = "generic/ubuntu1604"
   config.vm.provision "shell", inline: $script, privileged: false
 
+  config.vm.synced_folder ".", "/vagrant"
   config.vm.provider "hyperv" do |hv|
     hv.ip_address_timeout = 240
     hv.memory = 2048
